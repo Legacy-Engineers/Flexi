@@ -1,6 +1,8 @@
+from apps.core import APP_CONFIG_FILE, CONFIG_DIR
+import logging
+import importlib
 import os
 import yaml
-from apps.core import APP_CONFIG_FILE, CONFIG_DIR
 
 
 class AppDefinination:
@@ -61,6 +63,82 @@ class AppLoader:
         cls._loaded_apps = cls.load_apps_from_config()
 
     @classmethod
+    def get_app_config_data(cls):
+        file_data = {}
+        with open(APP_CONFIG_FILE, "r") as f:
+            loaded_data = yaml.safe_load(f)
+            if "apps" in loaded_data:
+                file_data = loaded_data.get("apps", [])
+
+        return file_data
+
+    @classmethod
+    def get_apps(cls):
+        valid_apps = []
+        try:
+            apps = cls.get_app_config_data()
+            for app in apps:
+                app_module = importlib.import_module(app["path"])
+                if app_module:
+                    valid_apps.append(app["path"])
+        except ImportError as ie:
+            logging.error(f"Error loading app {app['path']}: {ie}")
+        except AttributeError as ae:
+            logging.error(f"Error loading app {app['path']}: {ae}")
+        except Exception as e:
+            logging.error(f"Error loading apps: {e}")
+
+        # Fallback to default apps if no valid apps were loaded
+        if not valid_apps:
+            valid_apps = [app.path for app in FLEXI_APPS]
+
+        return valid_apps
+
+    @classmethod
+    def get_app_urls(cls):
+        app_urls = []
+        try:
+            apps = cls.get_apps()
+            for app in apps:
+                try:
+                    app_module = importlib.import_module(app)
+                    if hasattr(app_module, "urls"):
+                        app_urls.append(app_module.urls)
+                except ImportError as ie:
+                    logging.error(f"Error importing app {app}: {ie}")
+                except AttributeError as ae:
+                    logging.error(f"App {app} has no urls attribute: {ae}")
+                except Exception as e:
+                    logging.error(f"Error loading app {app}: {e}")
+        except Exception as e:
+            logging.error(f"Error in get_app_urls: {e}")
+        return app_urls
+
+    @classmethod
+    def get_app_graphql_schema(cls):
+        queries = []
+        mutations = []
+        try:
+            apps = cls.get_apps()
+            for app in apps:
+                try:
+                    app_schema_module = importlib.import_module(f"{app}.schema")
+                    if app_schema_module:
+                        if hasattr(app_schema_module, "Query"):
+                            queries.append(app_schema_module.Query)
+                        if hasattr(app_schema_module, "Mutation"):
+                            mutations.append(app_schema_module.Mutation)
+                except ImportError as ie:
+                    logging.error(f"Error importing schema for app {app}: {ie}")
+                except AttributeError as ae:
+                    logging.error(f"App {app} has no schema module: {ae}")
+                except Exception as e:
+                    logging.error(f"Error loading schema for app {app}: {e}")
+        except Exception as e:
+            logging.error(f"Error in get_app_graphql_schema: {e}")
+        return queries, mutations
+
+    @classmethod
     def generate_app_config(cls):
         """Generate clean YAML config file"""
         config_data = {"apps": [app.to_dict() for app in FLEXI_APPS]}
@@ -83,13 +161,6 @@ class AppLoader:
             return FLEXI_APPS
 
         return [AppDefinination.from_dict(app_data) for app_data in config_data["apps"]]
-
-    @classmethod
-    def get_apps(cls):
-        """Get the currently loaded apps"""
-        if cls._loaded_apps is None:
-            cls.initialize()
-        return cls._loaded_apps
 
     @classmethod
     def reload_apps(cls):

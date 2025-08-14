@@ -10,8 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from .common import BASE_DIR
-
+from apps.core.app_loader import AppLoader
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -23,6 +22,13 @@ INSTALLED_APPS = [
     # app
     "apps.core",
 ]
+
+THIRD_PARTY_APPS = ["rest_framework", "graphene_django"]
+
+CUSTOM_APPS = AppLoader.get_apps()
+
+INSTALLED_APPS += THIRD_PARTY_APPS + CUSTOM_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -93,3 +99,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+GRAPHENE = {
+    "SCHEMA": "apps.core.schema.schema",
+}

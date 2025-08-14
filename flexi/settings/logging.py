@@ -40,8 +40,8 @@ LOGGING = {
         },
     },
     "root": {
-        "handlers": ["console", "file"],
-        "level": "INFO",
+        "handlers": ["console", "file", "error_file"],
+        "level": "DEBUG",
     },
     "loggers": {
         "django": {
@@ -70,12 +70,27 @@ LOGGING = {
             "propagate": False,
         },
         "flexi": {
-            "handlers": ["console", "file"],
+            "handlers": ["console", "file", "error_file"],
             "level": "DEBUG",
             "propagate": False,
         },
         "apps": {
-            "handlers": ["console", "file"],
+            "handlers": ["console", "file", "error_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "apps.core": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "apps.account": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "apps.library": {
+            "handlers": ["console", "file", "error_file"],
             "level": "DEBUG",
             "propagate": False,
         },
@@ -94,11 +109,11 @@ LOGGING = {
             "datefmt": "%H:%M:%S",
         },
         "file": {
-            "format": "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] - %(message)s",
+            "format": "%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] [%(funcName)s] - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
         "security": {
-            "format": "%(asctime)s %(levelname)s [%(name)s] [%(ip)s] [%(user)s] - %(message)s",
+            "format": "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
         "simple": {
