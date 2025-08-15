@@ -23,7 +23,11 @@ INSTALLED_APPS = [
     "apps.core",
 ]
 
-THIRD_PARTY_APPS = ["rest_framework", "graphene_django"]
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "graphene_django",
+    "simple_history",
+]
 
 CUSTOM_APPS = AppLoader.get_apps()
 
@@ -39,6 +43,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+THIRD_PARTY_MIDDLEWARE = [
+    "simple_history.middleware.HistoryRequestMiddleware",
+]
+
+MIDDLEWARE += THIRD_PARTY_MIDDLEWARE
 
 ROOT_URLCONF = "flexi.urls"
 
@@ -101,6 +111,11 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+REST_FRAMEWORK = {}
+
 GRAPHENE = {
     "SCHEMA": "apps.core.schema.schema",
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
 }

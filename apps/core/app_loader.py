@@ -1,4 +1,5 @@
 from apps.core import APP_CONFIG_FILE, CONFIG_DIR
+from django.urls import path, include
 import logging
 import importlib
 import os
@@ -101,9 +102,9 @@ class AppLoader:
             apps = cls.get_apps()
             for app in apps:
                 try:
-                    app_module = importlib.import_module(app)
-                    if hasattr(app_module, "urls"):
-                        app_urls.append(app_module.urls)
+                    app_url_module = importlib.import_module(f"{app}.urls")
+                    if hasattr(app_url_module, "urlpatterns"):
+                        app_urls.append(path("", include(app_url_module.urlpatterns)))
                 except ImportError as ie:
                     logging.error(f"Error importing app {app}: {ie}")
                 except AttributeError as ae:
