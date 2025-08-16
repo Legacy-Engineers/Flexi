@@ -43,8 +43,8 @@ def create_combined_schema():
                     mutation_fields[field_name] = field
 
     # Create combined classes with all fields
-    combined_query = type("CombinedQuery", (Query,), query_fields)
-    combined_mutation = type("CombinedMutation", (Mutation,), mutation_fields)
+    combined_query = type("Query", (Query,), query_fields)
+    combined_mutation = type("Mutation", (Mutation,), mutation_fields)
 
     return graphene.Schema(query=combined_query, mutation=combined_mutation)
 
