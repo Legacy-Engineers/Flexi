@@ -27,6 +27,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "graphene_django",
     "simple_history",
+    "guardian",
 ]
 
 CUSTOM_APPS = AppLoader.get_apps()
